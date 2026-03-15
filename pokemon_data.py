@@ -1,0 +1,611 @@
+"""
+Pokemon dataset with rich descriptions for semantic vector search.
+Each Pokemon has structured attributes and a combined text description
+that gets embedded for similarity search.
+"""
+
+POKEMON = [
+    {
+        "id": 1,
+        "name": "Bulbasaur",
+        "types": ["Grass", "Poison"],
+        "color": "green",
+        "shape": "quadruped",
+        "height_m": 0.7,
+        "weight_kg": 6.9,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A small green quadruped dinosaur-like Pokemon with a plant bulb on its back. It is a Grass and Poison type. The bulb grows into a large flower as it evolves. It is gentle and easy to raise."
+    },
+    {
+        "id": 4,
+        "name": "Charmander",
+        "types": ["Fire"],
+        "color": "orange",
+        "shape": "bipedal",
+        "height_m": 0.6,
+        "weight_kg": 8.5,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A small orange bipedal lizard Pokemon with a flame burning on the tip of its tail. It is a Fire type. The flame on its tail indicates its health and emotions. It prefers hot places."
+    },
+    {
+        "id": 7,
+        "name": "Squirtle",
+        "types": ["Water"],
+        "color": "blue",
+        "shape": "bipedal",
+        "height_m": 0.5,
+        "weight_kg": 9.0,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A small blue bipedal turtle Pokemon with a rounded shell. It is a Water type. It shelters in its shell and sprays water at opponents. It is a reliable and friendly starter Pokemon."
+    },
+    {
+        "id": 25,
+        "name": "Pikachu",
+        "types": ["Electric"],
+        "color": "yellow",
+        "shape": "quadruped",
+        "height_m": 0.4,
+        "weight_kg": 6.0,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A small yellow mouse-like Pokemon with red cheek pouches that store electricity. It is an Electric type. It can release electric discharges from its cheeks. It is friendly and iconic."
+    },
+    {
+        "id": 6,
+        "name": "Charizard",
+        "types": ["Fire", "Flying"],
+        "color": "orange",
+        "shape": "bipedal",
+        "height_m": 1.7,
+        "weight_kg": 90.5,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A large orange dragon-like Pokemon with wings and a flaming tail. It is a Fire and Flying type. It breathes intense flames that can melt boulders. It flies through the sky seeking powerful opponents."
+    },
+    {
+        "id": 9,
+        "name": "Blastoise",
+        "types": ["Water"],
+        "color": "blue",
+        "shape": "bipedal",
+        "height_m": 1.6,
+        "weight_kg": 85.5,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A large blue bipedal turtle Pokemon with water cannons on its shell. It is a Water type. It blasts water with enough force to punch through steel. It is powerful and heavily armored."
+    },
+    {
+        "id": 3,
+        "name": "Venusaur",
+        "types": ["Grass", "Poison"],
+        "color": "green",
+        "shape": "quadruped",
+        "height_m": 2.0,
+        "weight_kg": 100.0,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A large green quadruped dinosaur Pokemon with a massive flower on its back. It is a Grass and Poison type. It absorbs sunlight through its flower to power its attacks. It is sturdy and resilient."
+    },
+    {
+        "id": 94,
+        "name": "Gengar",
+        "types": ["Ghost", "Poison"],
+        "color": "purple",
+        "shape": "bipedal",
+        "height_m": 1.5,
+        "weight_kg": 40.5,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A round purple shadow Pokemon with a sinister grin and red eyes. It is a Ghost and Poison type. It hides in shadows and lowers the temperature of its surroundings. It is mischievous and spooky."
+    },
+    {
+        "id": 143,
+        "name": "Snorlax",
+        "types": ["Normal"],
+        "color": "blue",
+        "shape": "bipedal",
+        "height_m": 2.1,
+        "weight_kg": 460.0,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A massive round blue and cream colored Pokemon that loves to sleep and eat. It is a Normal type. It eats nearly 900 pounds of food per day and sleeps most of the time. It is incredibly heavy and strong."
+    },
+    {
+        "id": 150,
+        "name": "Mewtwo",
+        "types": ["Psychic"],
+        "color": "purple",
+        "shape": "bipedal",
+        "height_m": 2.0,
+        "weight_kg": 122.0,
+        "generation": 1,
+        "is_legendary": True,
+        "description": "A tall purple and white humanoid Pokemon created by genetic engineering. It is a Psychic type legendary Pokemon. It has immense psychic power and was cloned from Mew. It is extremely powerful and intelligent."
+    },
+    {
+        "id": 149,
+        "name": "Dragonite",
+        "types": ["Dragon", "Flying"],
+        "color": "orange",
+        "shape": "bipedal",
+        "height_m": 2.2,
+        "weight_kg": 210.0,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A large orange dragon Pokemon with small wings and a friendly face. It is a Dragon and Flying type. It can fly around the globe in 16 hours. Despite its power, it is gentle and kindhearted."
+    },
+    {
+        "id": 130,
+        "name": "Gyarados",
+        "types": ["Water", "Flying"],
+        "color": "blue",
+        "shape": "serpentine",
+        "height_m": 6.5,
+        "weight_kg": 235.0,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A huge blue serpentine sea dragon Pokemon known for its destructive rage. It is a Water and Flying type. It evolved from the weak Magikarp and can destroy entire cities with its fury. It is fearsome and powerful."
+    },
+    {
+        "id": 131,
+        "name": "Lapras",
+        "types": ["Water", "Ice"],
+        "color": "blue",
+        "shape": "quadruped",
+        "height_m": 2.5,
+        "weight_kg": 220.0,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A large blue plesiosaur-like Pokemon with a shell on its back. It is a Water and Ice type. It ferries people across bodies of water and sings beautiful melodies. It is gentle and intelligent."
+    },
+    {
+        "id": 39,
+        "name": "Jigglypuff",
+        "types": ["Normal", "Fairy"],
+        "color": "pink",
+        "shape": "round",
+        "height_m": 0.5,
+        "weight_kg": 5.5,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A small round pink balloon-like Pokemon with large blue eyes. It is a Normal and Fairy type. It sings a lullaby that puts everyone to sleep. It is cute, puffy, and inflatable."
+    },
+    {
+        "id": 133,
+        "name": "Eevee",
+        "types": ["Normal"],
+        "color": "brown",
+        "shape": "quadruped",
+        "height_m": 0.3,
+        "weight_kg": 6.5,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A small brown fox-like Pokemon with a fluffy tail and large ears. It is a Normal type. It has unstable DNA that allows it to evolve into many different forms. It is adorable and versatile."
+    },
+    {
+        "id": 448,
+        "name": "Lucario",
+        "types": ["Fighting", "Steel"],
+        "color": "blue",
+        "shape": "bipedal",
+        "height_m": 1.2,
+        "weight_kg": 54.0,
+        "generation": 4,
+        "is_legendary": False,
+        "description": "A blue and black jackal-like bipedal Pokemon with aura-sensing abilities. It is a Fighting and Steel type. It can read aura to predict movements and detect emotions. It is noble, loyal, and a skilled fighter."
+    },
+    {
+        "id": 445,
+        "name": "Garchomp",
+        "types": ["Dragon", "Ground"],
+        "color": "blue",
+        "shape": "bipedal",
+        "height_m": 1.9,
+        "weight_kg": 95.0,
+        "generation": 4,
+        "is_legendary": False,
+        "description": "A large blue shark-like dragon Pokemon with scythe-shaped arms. It is a Dragon and Ground type. It can fly at the speed of a jet and never lets its prey escape. It is fierce and incredibly fast."
+    },
+    {
+        "id": 282,
+        "name": "Gardevoir",
+        "types": ["Psychic", "Fairy"],
+        "color": "white",
+        "shape": "bipedal",
+        "height_m": 1.6,
+        "weight_kg": 48.4,
+        "generation": 3,
+        "is_legendary": False,
+        "description": "An elegant white and green humanoid Pokemon that resembles a dancer. It is a Psychic and Fairy type. It can sense the feelings of its trainer and will give its life to protect them. It is graceful and devoted."
+    },
+    {
+        "id": 384,
+        "name": "Rayquaza",
+        "types": ["Dragon", "Flying"],
+        "color": "green",
+        "shape": "serpentine",
+        "height_m": 7.0,
+        "weight_kg": 206.5,
+        "generation": 3,
+        "is_legendary": True,
+        "description": "A massive green serpentine dragon Pokemon that lives in the ozone layer. It is a Dragon and Flying type legendary Pokemon. It mediates between Groudon and Kyogre. It is majestic and immensely powerful."
+    },
+    {
+        "id": 249,
+        "name": "Lugia",
+        "types": ["Psychic", "Flying"],
+        "color": "white",
+        "shape": "bipedal",
+        "height_m": 5.2,
+        "weight_kg": 216.0,
+        "generation": 2,
+        "is_legendary": True,
+        "description": "A large white and blue dragon-like Pokemon known as the guardian of the seas. It is a Psychic and Flying type legendary Pokemon. It sleeps in deep ocean trenches and its wings cause storms. It is wise and protective."
+    },
+    {
+        "id": 248,
+        "name": "Tyranitar",
+        "types": ["Rock", "Dark"],
+        "color": "green",
+        "shape": "bipedal",
+        "height_m": 2.0,
+        "weight_kg": 202.0,
+        "generation": 2,
+        "is_legendary": False,
+        "description": "A large green armored dinosaur-like Pokemon that is extremely destructive. It is a Rock and Dark type. It can topple mountains and change the landscape. It is aggressive and nearly unstoppable."
+    },
+    {
+        "id": 257,
+        "name": "Blaziken",
+        "types": ["Fire", "Fighting"],
+        "color": "red",
+        "shape": "bipedal",
+        "height_m": 1.9,
+        "weight_kg": 52.0,
+        "generation": 3,
+        "is_legendary": False,
+        "description": "A tall red and cream colored bipedal chicken Pokemon with powerful legs. It is a Fire and Fighting type. It can leap over a 30-story building and delivers devastating fire kicks. It is a fierce martial artist."
+    },
+    {
+        "id": 376,
+        "name": "Metagross",
+        "types": ["Steel", "Psychic"],
+        "color": "blue",
+        "shape": "quadruped",
+        "height_m": 1.6,
+        "weight_kg": 550.0,
+        "generation": 3,
+        "is_legendary": False,
+        "description": "A massive blue metallic four-legged Pokemon resembling a supercomputer. It is a Steel and Psychic type. It has four brains linked together giving it supercomputer intelligence. It is incredibly heavy and smart."
+    },
+    {
+        "id": 197,
+        "name": "Umbreon",
+        "types": ["Dark"],
+        "color": "black",
+        "shape": "quadruped",
+        "height_m": 1.0,
+        "weight_kg": 27.0,
+        "generation": 2,
+        "is_legendary": False,
+        "description": "A sleek black fox-like Pokemon with glowing yellow ring markings. It is a Dark type. It evolved from Eevee under moonlight. Its rings glow when exposed to moonlight and it lurks in darkness. It is mysterious and elegant."
+    },
+    {
+        "id": 196,
+        "name": "Espeon",
+        "types": ["Psychic"],
+        "color": "purple",
+        "shape": "quadruped",
+        "height_m": 0.9,
+        "weight_kg": 26.5,
+        "generation": 2,
+        "is_legendary": False,
+        "description": "A lavender purple cat-like Pokemon with a forked tail and a jewel on its forehead. It is a Psychic type. It evolved from Eevee through strong friendship in daylight. It can predict its opponent's moves. It is elegant and loyal."
+    },
+    {
+        "id": 136,
+        "name": "Flareon",
+        "types": ["Fire"],
+        "color": "red",
+        "shape": "quadruped",
+        "height_m": 0.9,
+        "weight_kg": 25.0,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A fluffy red and orange fox-like Pokemon with a flame-like mane. It is a Fire type. It evolved from Eevee with a Fire Stone. Its body temperature can reach over 1600 degrees. It is warm and cuddly looking."
+    },
+    {
+        "id": 134,
+        "name": "Vaporeon",
+        "types": ["Water"],
+        "color": "blue",
+        "shape": "quadruped",
+        "height_m": 1.0,
+        "weight_kg": 29.0,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A blue aquatic fox-like Pokemon with a mermaid-like tail and fins. It is a Water type. It evolved from Eevee with a Water Stone. It can melt into water and become invisible. It is graceful and fluid."
+    },
+    {
+        "id": 135,
+        "name": "Jolteon",
+        "types": ["Electric"],
+        "color": "yellow",
+        "shape": "quadruped",
+        "height_m": 0.8,
+        "weight_kg": 24.5,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A spiky yellow fox-like Pokemon with sharp fur that stands on end. It is an Electric type. It evolved from Eevee with a Thunder Stone. It can generate lightning bolts. It is fast and energetic."
+    },
+    {
+        "id": 700,
+        "name": "Sylveon",
+        "types": ["Fairy"],
+        "color": "pink",
+        "shape": "quadruped",
+        "height_m": 1.0,
+        "weight_kg": 23.5,
+        "generation": 6,
+        "is_legendary": False,
+        "description": "A pink and white fairy fox-like Pokemon with ribbon-like feelers. It is a Fairy type. It evolved from Eevee through affection. It wraps its ribbon feelers around its trainer's arm. It is charming and gentle."
+    },
+    {
+        "id": 471,
+        "name": "Glaceon",
+        "types": ["Ice"],
+        "color": "blue",
+        "shape": "quadruped",
+        "height_m": 0.8,
+        "weight_kg": 25.9,
+        "generation": 4,
+        "is_legendary": False,
+        "description": "A light blue ice crystal fox-like Pokemon with diamond-shaped patterns. It is an Ice type. It evolved from Eevee near an icy rock. It can freeze the air around it and create ice crystals. It is cool and beautiful."
+    },
+    {
+        "id": 470,
+        "name": "Leafeon",
+        "types": ["Grass"],
+        "color": "green",
+        "shape": "quadruped",
+        "height_m": 1.0,
+        "weight_kg": 25.5,
+        "generation": 4,
+        "is_legendary": False,
+        "description": "A green leaf-covered fox-like Pokemon with leaf ears and tail. It is a Grass type. It evolved from Eevee near a mossy rock. It uses photosynthesis and always smells fresh like nature. It is peaceful and natural."
+    },
+    {
+        "id": 95,
+        "name": "Onix",
+        "types": ["Rock", "Ground"],
+        "color": "gray",
+        "shape": "serpentine",
+        "height_m": 8.8,
+        "weight_kg": 210.0,
+        "generation": 1,
+        "is_legendary": False,
+        "description": "A massive gray rock serpent Pokemon made of connected boulders. It is a Rock and Ground type. It burrows through the earth at 50 mph and can reach lengths of 30 feet. It is imposing and tough."
+    },
+    {
+        "id": 658,
+        "name": "Greninja",
+        "types": ["Water", "Dark"],
+        "color": "blue",
+        "shape": "bipedal",
+        "height_m": 1.5,
+        "weight_kg": 40.0,
+        "generation": 6,
+        "is_legendary": False,
+        "description": "A dark blue ninja frog Pokemon with a tongue scarf. It is a Water and Dark type. It moves with the speed and grace of a ninja and creates throwing stars from compressed water. It is stealthy and agile."
+    },
+    {
+        "id": 778,
+        "name": "Mimikyu",
+        "types": ["Ghost", "Fairy"],
+        "color": "yellow",
+        "shape": "bipedal",
+        "height_m": 0.2,
+        "weight_kg": 0.7,
+        "generation": 7,
+        "is_legendary": False,
+        "description": "A tiny ghost Pokemon disguised as a Pikachu with a crude cloth costume. It is a Ghost and Fairy type. It wears a disguise because it is lonely and wants to be loved like Pikachu. It is sad, cute, and mysterious."
+    },
+    {
+        "id": 445,
+        "name": "Togekiss",
+        "types": ["Fairy", "Flying"],
+        "color": "white",
+        "shape": "winged",
+        "height_m": 1.5,
+        "weight_kg": 38.0,
+        "generation": 4,
+        "is_legendary": False,
+        "description": "A white jubilee Pokemon with red and blue triangle markings and small wings. It is a Fairy and Flying type. It shares blessings and good fortune with kind people. It avoids conflict and brings happiness."
+    },
+    {
+        "id": 889,
+        "name": "Zamazenta",
+        "types": ["Fighting", "Steel"],
+        "color": "red",
+        "shape": "quadruped",
+        "height_m": 2.9,
+        "weight_kg": 210.0,
+        "generation": 8,
+        "is_legendary": True,
+        "description": "A large red and blue wolf-like legendary Pokemon with a shield mane. It is a Fighting and Steel type legendary Pokemon. It absorbs metal to form its shield. It is regal, brave, and a protector of the land."
+    },
+    {
+        "id": 888,
+        "name": "Zacian",
+        "types": ["Fairy", "Steel"],
+        "color": "blue",
+        "shape": "quadruped",
+        "height_m": 2.8,
+        "weight_kg": 110.0,
+        "generation": 8,
+        "is_legendary": True,
+        "description": "A blue and cyan wolf-like legendary Pokemon that wields a sword in its mouth. It is a Fairy and Steel type legendary Pokemon. It cuts through anything with graceful swordsmanship. It is elegant, noble, and a legendary warrior."
+    },
+    {
+        "id": 887,
+        "name": "Dragapult",
+        "types": ["Dragon", "Ghost"],
+        "color": "blue",
+        "shape": "bipedal",
+        "height_m": 3.0,
+        "weight_kg": 50.0,
+        "generation": 8,
+        "is_legendary": False,
+        "description": "A sleek blue and purple stealth bomber dragon Pokemon. It is a Dragon and Ghost type. It launches its baby Dreepy like missiles at Mach speed. It is fast, ghostly, and futuristic looking."
+    },
+    {
+        "id": 812,
+        "name": "Rillaboom",
+        "types": ["Grass"],
+        "color": "green",
+        "shape": "bipedal",
+        "height_m": 2.1,
+        "weight_kg": 90.0,
+        "generation": 8,
+        "is_legendary": False,
+        "description": "A large green gorilla Pokemon with a wooden drum. It is a Grass type. It controls roots with its drumming and has a strong sense of rhythm. It is powerful and musical."
+    },
+    {
+        "id": 815,
+        "name": "Cinderace",
+        "types": ["Fire"],
+        "color": "white",
+        "shape": "bipedal",
+        "height_m": 1.4,
+        "weight_kg": 33.0,
+        "generation": 8,
+        "is_legendary": False,
+        "description": "A white and red rabbit Pokemon that kicks fire balls like a soccer player. It is a Fire type. It juggles a pebble with its feet and sets it ablaze with its fiery energy. It is athletic and spirited."
+    },
+    {
+        "id": 818,
+        "name": "Inteleon",
+        "types": ["Water"],
+        "color": "blue",
+        "shape": "bipedal",
+        "height_m": 1.9,
+        "weight_kg": 45.2,
+        "generation": 8,
+        "is_legendary": False,
+        "description": "A sleek blue chameleon-like spy Pokemon with a long tail. It is a Water type. It shoots water from its fingertip like a sniper and has sharp intelligence. It is cool, calculating, and secretive."
+    },
+    {
+        "id": 637,
+        "name": "Volcarona",
+        "types": ["Bug", "Fire"],
+        "color": "white",
+        "shape": "winged",
+        "height_m": 1.6,
+        "weight_kg": 46.0,
+        "generation": 5,
+        "is_legendary": False,
+        "description": "A large white and orange moth Pokemon with six fiery red wings. It is a Bug and Fire type. It was worshipped as the embodiment of the sun in ancient times. It scatters burning scales. It is majestic and radiant."
+    },
+    {
+        "id": 571,
+        "name": "Zoroark",
+        "types": ["Dark"],
+        "color": "gray",
+        "shape": "bipedal",
+        "height_m": 1.6,
+        "weight_kg": 81.1,
+        "generation": 5,
+        "is_legendary": False,
+        "description": "A dark gray and red fox-like Pokemon with a long flowing crimson mane. It is a Dark type. It creates illusions to deceive enemies and protect its pack. It is cunning, fierce, and protective."
+    },
+    {
+        "id": 609,
+        "name": "Chandelure",
+        "types": ["Ghost", "Fire"],
+        "color": "purple",
+        "shape": "round",
+        "height_m": 1.0,
+        "weight_kg": 34.3,
+        "generation": 5,
+        "is_legendary": False,
+        "description": "A purple chandelier-like ghost Pokemon with eerie blue flames. It is a Ghost and Fire type. It lures people with its hypnotic flames and absorbs their spirits. It is haunting and beautiful."
+    },
+    {
+        "id": 635,
+        "name": "Hydreigon",
+        "types": ["Dark", "Dragon"],
+        "color": "blue",
+        "shape": "bipedal",
+        "height_m": 1.8,
+        "weight_kg": 160.0,
+        "generation": 5,
+        "is_legendary": False,
+        "description": "A dark blue three-headed dragon Pokemon with six wings. It is a Dark and Dragon type. It destroys everything in its path and its three heads attack anything that moves. It is brutal and destructive."
+    },
+    {
+        "id": 718,
+        "name": "Zygarde",
+        "types": ["Dragon", "Ground"],
+        "color": "green",
+        "shape": "serpentine",
+        "height_m": 5.0,
+        "weight_kg": 305.0,
+        "generation": 6,
+        "is_legendary": True,
+        "description": "A green and black hexagonal-patterned serpent legendary Pokemon. It is a Dragon and Ground type legendary Pokemon. It monitors the ecosystem and appears when the ecosystem is in danger. It is a guardian of nature and order."
+    },
+    {
+        "id": 493,
+        "name": "Arceus",
+        "types": ["Normal"],
+        "color": "white",
+        "shape": "quadruped",
+        "height_m": 3.2,
+        "weight_kg": 320.0,
+        "generation": 4,
+        "is_legendary": True,
+        "description": "A white and gold divine quadruped Pokemon said to have created the universe. It is a Normal type legendary Pokemon. It shaped the world with its thousand arms. It is the most powerful mythical creator deity Pokemon."
+    },
+    {
+        "id": 483,
+        "name": "Dialga",
+        "types": ["Steel", "Dragon"],
+        "color": "blue",
+        "shape": "quadruped",
+        "height_m": 5.4,
+        "weight_kg": 683.0,
+        "generation": 4,
+        "is_legendary": True,
+        "description": "A large blue steel dragon Pokemon with a diamond on its chest. It is a Steel and Dragon type legendary Pokemon. It has the power to control time itself. It is ancient, powerful, and a ruler of time."
+    },
+    {
+        "id": 484,
+        "name": "Palkia",
+        "types": ["Water", "Dragon"],
+        "color": "purple",
+        "shape": "bipedal",
+        "height_m": 4.2,
+        "weight_kg": 336.0,
+        "generation": 4,
+        "is_legendary": True,
+        "description": "A large purple and white dragon Pokemon with pearl-like shoulders. It is a Water and Dragon type legendary Pokemon. It has the power to distort and create space. It is a spatial deity Pokemon of immense power."
+    },
+]
+
+
+def build_search_text(pokemon: dict) -> str:
+    """Build a rich text description for embedding from Pokemon attributes."""
+    types_str = " and ".join(pokemon["types"])
+    legendary_str = "legendary " if pokemon["is_legendary"] else ""
+    size_str = "small" if pokemon["weight_kg"] < 20 else "medium" if pokemon["weight_kg"] < 80 else "large" if pokemon["weight_kg"] < 200 else "massive"
+
+    return (
+        f"{pokemon['name']} is a {size_str} {legendary_str}{pokemon['color']} colored {pokemon['shape']} Pokemon. "
+        f"It is a {types_str} type. "
+        f"It is {pokemon['height_m']}m tall and weighs {pokemon['weight_kg']}kg. "
+        f"Generation {pokemon['generation']}. "
+        f"{pokemon['description']}"
+    )
