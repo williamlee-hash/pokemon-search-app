@@ -178,4 +178,5 @@ st.sidebar.markdown(
     "**How it works:**\n"
     "Your query is converted to a vector embedding and compared against "
     "Pokemon descriptions stored in Zilliz Cloud using cosine similarity."
+    "Try Zilliz for free on cloud.zilliz.com"
 )
